@@ -304,25 +304,36 @@
   }
 
   function formatBotResponse(response) {
-  // Remove trailing signature like "— john"
+  // Remove garbage characters (like "Giyaించందీ")
+  response = response.replace(/^[^\w<]+/, '');
+
+  // Remove email-style signature (e.g., — john)
   response = response.replace(/—\s*\w+$/, '');
+
+  // Headings (### Heading)
+  response = response.replace(/^###\s*(.+)$/gm, '<h3>$1</h3>');
 
   // Bold (**text**)
   response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-  // Convert Markdown numbered list (1., 2., etc.)
+  // Links: [text](url)
+  response = response.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+  // Numbered list (1. Item)
   response = response.replace(/(^|\n)\d+\.\s+(.*?)(?=\n|$)/g, '\n<li>$2</li>');
   response = response.replace(/(<li>.*<\/li>)/gs, '<ol>$1</ol>');
 
-  // Convert Markdown bullet list (- item)
+  // Bulleted list (- Item)
   response = response.replace(/(^|\n)-\s+(.*?)(?=\n|$)/g, '\n<li>$2</li>');
   response = response.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
 
-  // Convert newlines to <br> (except between <li> to avoid double spacing)
-  response = response.replace(/(?<!<\/li>)\n+/g, '<br>');
+  // Collapse multiple newlines and replace remaining with <br>
+  response = response.replace(/\n{2,}/g, '<br><br>');
+  response = response.replace(/\n/g, '<br>');
 
   return response.trim();
 }
+
 
 
   async function sendMessage() {
