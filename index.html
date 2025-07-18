@@ -365,7 +365,7 @@
 
     const userId = getUserId();
     const encodedMessage = encodeURIComponent(message);
-    const url = `${webhookBaseUrl}?query=${encodedMessage}&userId=${encodeURIComponent(userId)}`;
+    const url = `${webhookBaseUrl}?query=${encodedMessage}&userId=${encodeURIComponent(userId)}&site=${encodeURIComponent('Groton_Technologies')}`;
 
     // Add loading message
     const loadingMsg = document.createElement('div');
