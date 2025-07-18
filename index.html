@@ -344,7 +344,7 @@
     if (!message) return;
 
     // Show user message
-    chatMessages.innerHTML += `<div class="msg-user"><strong>You:</strong> ${message}</div>`;
+    chatMessages.innerHTML += `<div class="msg-user">${message}</div>`;
     chatMessages.scrollTop = chatMessages.scrollHeight;
     inputField.value = '';
 
@@ -355,7 +355,7 @@
     // Add loading message
     const loadingMsg = document.createElement('div');
     loadingMsg.className = 'msg-bot';
-    loadingMsg.innerHTML = `<strong>Bot:</strong> <em>Thinking...</em>`;
+    loadingMsg.innerHTML = `<em>Thinking...</em>`;
     chatMessages.appendChild(loadingMsg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
