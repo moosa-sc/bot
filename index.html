@@ -304,40 +304,26 @@
   }
 
   function formatBotResponse(response) {
-    // Remove signatures (e.g., "— john")
-    response = response.replace(/—\s*\w+$/, '');
+  // Remove trailing signature like "— john"
+  response = response.replace(/—\s*\w+$/, '');
 
-    // Convert Markdown headings (###) to HTML <h3>
-    response = response.replace(/###\s*([^\\n]+)/g, '<h3>$1</h3>');
+  // Bold (**text**)
+  response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-    // Convert Markdown bold (**text**) to HTML <strong>
-    response = response.replace(/\*\*([^\\*]+)\*\*/g, '<strong>$1</strong>');
+  // Convert Markdown numbered list (1., 2., etc.)
+  response = response.replace(/(^|\n)\d+\.\s+(.*?)(?=\n|$)/g, '\n<li>$2</li>');
+  response = response.replace(/(<li>.*<\/li>)/gs, '<ol>$1</ol>');
 
-    // Convert numbered list items to HTML ordered list
-    response = response.replace(/(\d+\.\s*[^\\n]+)/g, (match) => {
-      return `<li>${match.replace(/^\d+\.\s*/, '')}</li>`;
-    });
+  // Convert Markdown bullet list (- item)
+  response = response.replace(/(^|\n)-\s+(.*?)(?=\n|$)/g, '\n<li>$2</li>');
+  response = response.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
 
-    // Convert nested lists (e.g., "- **text**: description") to HTML sublists
-    response = response.replace(/-\s*(\*\*[^:]+:\*\*\s*[^\\n]+)/g, (match) => {
-      const content = match.replace(/-\s*\*\*([^:]+):\*\*\s*/, '<strong>$1:</strong> ');
-      return `<li>${content}</li>`;
-    });
+  // Convert newlines to <br> (except between <li> to avoid double spacing)
+  response = response.replace(/(?<!<\/li>)\n+/g, '<br>');
 
-    // Wrap list items in appropriate tags
-    if (response.includes('<li>')) {
-      response = response.replace(/(<li>.*<\/li>)/s, (match) => {
-        // Check if the list is numbered (contains digits at start)
-        const isNumbered = match.match(/^\d+\./);
-        return isNumbered ? `<ol>${match}</ol>` : `<ul>${match}</ul>`;
-      });
-    }
+  return response.trim();
+}
 
-    // Replace multiple newlines with single <br> for clean spacing
-    response = response.replace(/\n+/g, '<br>');
-
-    return response.trim();
-  }
 
   async function sendMessage() {
     const message = inputField.value.trim();
@@ -355,7 +341,7 @@
     // Add loading message
     const loadingMsg = document.createElement('div');
     loadingMsg.className = 'msg-bot';
-    loadingMsg.innerHTML = `<em>Thinking...</em>`;
+    loadingMsg.innerHTML = `<em>...</em>`;
     chatMessages.appendChild(loadingMsg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
