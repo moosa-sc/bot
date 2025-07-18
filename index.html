@@ -321,10 +321,10 @@
   }
 
   function formatBotResponse(response) {
-  // Remove garbage characters (like "Giyaించందీ")
+  // Remove garbage characters at the beginning
   response = response.replace(/^[^\w<]+/, '');
 
-  // Remove email-style signature (e.g., — john)
+  // Remove trailing email signature
   response = response.replace(/—\s*\w+$/, '');
 
   // Headings (### Heading)
@@ -336,13 +336,13 @@
   // Links: [text](url)
   response = response.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-  // Numbered list (1. Item)
+  // Convert numbered list items
   response = response.replace(/(^|\n)\d+\.\s+(.*?)(?=\n|$)/g, '\n<li>$2</li>');
-  response = response.replace(/(<li>.*<\/li>)/gs, '<ol>$1</ol>');
+  response = response.replace(/(<li>.*<\/li>)/gs, match => `<ol>${match}</ol>`); // Fix here: wrap group, not each
 
-  // Bulleted list (- Item)
+  // Convert bullet list items
   response = response.replace(/(^|\n)-\s+(.*?)(?=\n|$)/g, '\n<li>$2</li>');
-  response = response.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+  response = response.replace(/(<li>.*<\/li>)/gs, match => `<ul>${match}</ul>`); // Fix here: wrap group, not each
 
   // Collapse multiple newlines and replace remaining with <br>
   response = response.replace(/\n{2,}/g, '<br><br>');
@@ -350,6 +350,7 @@
 
   return response.trim();
 }
+
 
 
 
